@@ -5,10 +5,6 @@ mod menu;
 mod report_wages;
 
 fn main() {
-  println!("Hello, world!");
-
-  // Load modules for each operation and prepare them.
-
   // Print a menu to the user asking which operation will be done.
   let operation = menu::show();
 

@@ -16,7 +16,7 @@ impl Display for Operations {
 }
 
 pub fn show() -> Operations {
-  let options = [Operations::CalculatePaycheck, Operations::ReportWages];
+  let options = [Operations::ReportWages, Operations::CalculatePaycheck];
   let mut menu = youchoose::Menu::new(options.iter()).preview(preview);
 
   let choices = menu.show();
