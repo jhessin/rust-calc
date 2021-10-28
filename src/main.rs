@@ -3,8 +3,9 @@ use crate::menu::Operations;
 mod calculate_paycheck;
 mod menu;
 mod report_wages;
+mod util;
 
-fn main() {
+fn main() -> anyhow::Result<()> {
   // Print a menu to the user asking which operation will be done.
   let operation = menu::show();
 
