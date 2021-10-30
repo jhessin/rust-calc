@@ -1,11 +1,8 @@
 use std::fmt::Write;
-use std::iter::Map;
-use std::ops::{Deref, DerefMut};
-use std::slice::Iter;
 
-use chrono::{DateTime, Datelike, Local};
+use chrono::{DateTime, Datelike, Local, TimeZone};
 
-use crate::menu::menu_result::MenuResult;
+use crate::lib::menu::menu_result::{MenuData, MenuResult};
 
 #[derive(Copy, Clone, Debug)]
 pub struct Shift {
@@ -22,13 +19,26 @@ pub struct Shift {
 impl Shift {
   /// This will prompt the user for new shift data.
   pub fn from_input() -> Self {
-    // TODO:
-    Shift {
-      clock_in: Local::now(),
-      clock_out: Local::now(),
-      incentive: None,
-      short: None,
-    }
+    let year = prompt!("What year did you clock in?");
+    let month = prompt!("Month?");
+    let day = prompt!("Day?");
+    let hour: f64 = prompt!("What hour did you clock in (with decimal)");
+    let (hour, min, sec) =
+      (hour.floor() as u32, (hour.fract() * 60.0) as u32, 0);
+    let clock_in = Local.ymd(year, month, day).and_hms(hour, min, sec);
+    let year = prompt!("What year did you clock out?");
+    let month = prompt!("Month?");
+    let day = prompt!("Day?");
+    let hour: f64 = prompt!("What hour did you clock out (with decimal)");
+    let (hour, min, sec) =
+      (hour.floor() as u32, (hour.fract() * 60.0) as u32, 0);
+    let clock_out = Local.ymd(year, month, day).and_hms(hour, min, sec);
+    let incentive: bool = prompt!("Was incentive offered?");
+    let incentive =
+      if incentive { Some(prompt!("How many hours?")) } else { None };
+    let short: bool = prompt!("Were you short during the shift?");
+    let short = if short { Some(prompt!("How many hours?")) } else { None };
+    Shift { clock_in, clock_out, incentive, short }
   }
 
   /// returns the duration of the shift in hours
@@ -46,6 +56,11 @@ impl Shift {
   pub fn short_len(&self) -> Option<f64> {
     self.short
   }
+
+  /// Update shift data with user input
+  pub fn update(&self) -> Self {
+    todo!("Prompt user for updated info here")
+  }
 }
 
 #[derive(Clone, Debug)]
@@ -62,31 +77,56 @@ pub struct PaycheckCalculator {
   shifts: Vec<Shift>,
 }
 
-impl Deref for PaycheckCalculator {
-  type Target = Vec<Shift>;
+impl PaycheckCalculator {
+  /// Get menu data for calculator
+  pub fn menu(&self) -> Vec<MenuResult<Shift>> {
+    let mut data: Vec<MenuResult<Shift>> = self
+      .shifts
+      .iter()
+      .map(|shift| {
+        MenuResult::new(
+          &shift.clock_in.date().format("MM/DD").to_string(),
+          &format!("{:?} - {:?}", shift.clock_in, shift.clock_out),
+          MenuData::Data(*shift),
+        )
+      })
+      .collect();
+    data.push(MenuResult::new(
+      "New shift",
+      "Add a new shift",
+      MenuData::Action(Shift::from_input),
+    ));
+    data.push(MenuResult::new(
+      "Total",
+      &self.calculate().unwrap_or_else(|_| {
+        String::from(
+          "Error \
+		  calculating a total",
+        )
+      }),
+      MenuData::Quit,
+    ));
+    data
+  }
 
-  fn deref(&self) -> &Self::Target {
-    &self.shifts
+  pub fn update_shift(&mut self, index: usize, data: Shift) -> bool {
+    if let Some(entry) = self.shifts.get_mut(index) {
+      *entry = data;
+      true
+    } else {
+      false
+    }
   }
 }
-
-impl DerefMut for PaycheckCalculator {
-  fn deref_mut(&mut self) -> &mut Self::Target {
-    &mut self.shifts
-  }
-}
-
-type ShiftIter<'a> = Map<Iter<'a, Shift>, fn(&Shift) -> MenuResult<Shift>>;
 
 impl PaycheckCalculator {
   /// This will prompt the user for new data to build a Calculator.
   pub fn from_input() -> Self {
-    // TODO:
     PaycheckCalculator {
-      base_rate: 0.0,
-      weekend_diff: 0.0,
-      incentive_diff: 0.0,
-      short_diff: 0.0,
+      base_rate: prompt!("What is the base rate?"),
+      weekend_diff: prompt!("How much more is paid on weekends?"),
+      incentive_diff: prompt!("How much incentive is offered?"),
+      short_diff: prompt!("How much is given when the shift is short?"),
       shifts: vec![],
     }
   }
@@ -98,17 +138,6 @@ impl PaycheckCalculator {
 
   pub fn rm_shift(&mut self, shift: usize) -> Shift {
     self.shifts.remove(shift)
-  }
-
-  /// Generate an iterator
-  pub fn iter(&self) -> ShiftIter {
-    self.shifts.iter().map(|shift| {
-      MenuResult::new(
-        &shift.clock_in.date().format("MM/DD").to_string(),
-        &format!("{:?} - {:?}", shift.clock_in, shift.clock_out),
-        shift,
-      )
-    })
   }
 
   /// Generate a report for how much the paycheck should be.
@@ -154,5 +183,11 @@ impl PaycheckCalculator {
     result += "============================================\n";
     writeln!(result, "Total Earned this paycheck is {}", total)?;
     Ok(result)
+  }
+}
+
+impl std::ops::AddAssign<Shift> for PaycheckCalculator {
+  fn add_assign(&mut self, rhs: Shift) {
+    self.shifts.push(rhs);
   }
 }

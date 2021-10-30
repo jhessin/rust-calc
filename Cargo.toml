@@ -7,5 +7,7 @@ edition = "2018"
 
 [dependencies]
 youchoose = "0.1.1"
+crossterm = "0.20"
+tui = { version = "0.16", default-features = false, features = ['crossterm'] }
 chrono = "0.4.19"
 anyhow = "1.0.44"
