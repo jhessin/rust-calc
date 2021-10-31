@@ -5,7 +5,7 @@ macro_rules! parse_input {
     #[allow(unused_imports)]
     use std::io::{stdin, stdout, Write};
     let mut response = String::new();
-    print!("{}? ->", $x);
+    print!("{} ->", $x);
     stdout().flush().unwrap();
     stdin().read_line(&mut response).expect("Failed to read line");
     response.trim().parse::<$t>().context("Couldn't parse input")
@@ -14,7 +14,7 @@ macro_rules! parse_input {
     use anyhow::Context;
     use std::io::{stdin, stdout, Write};
     let mut response = String::new();
-    print!("{}? ->", $x);
+    print!("{} ->", $x);
     stdout().flush().unwrap();
     stdin().read_line(&mut response).expect("Failed to read line");
     response.trim().parse().context("Couldn't parse input")

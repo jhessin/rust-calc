@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 use std::fmt;
 use std::iter::Peekable;
 
@@ -8,8 +9,6 @@ use keys::*;
 use preview::*;
 use screen::*;
 use MenuReturnCode::{Done, Pass};
-
-use crate::lib::menu::you_choose::screen::Screen;
 
 mod config;
 mod disp;
