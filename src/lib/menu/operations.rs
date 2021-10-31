@@ -1,26 +1,31 @@
-use std::fmt::{self, Display, Formatter};
+use std::fmt;
 
 #[derive(Copy, Clone)]
 pub enum Operations {
-  CalculatePaycheck,
   ReportWages,
+  CalculatePaycheck,
 }
 
-impl Display for Operations {
-  fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+impl Operations {
+  pub const EACH: [Operations; 2] =
+    [Operations::ReportWages, Operations::CalculatePaycheck];
+
+  pub fn show() -> Operations {
+    let mut menu =
+      youchoose::Menu::new(Operations::EACH.iter()).preview(preview);
+
+    let choices = menu.show();
+    Operations::EACH[*choices.first().expect("Invalid choice given")]
+  }
+}
+
+impl fmt::Display for Operations {
+  fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
     match self {
       Operations::CalculatePaycheck => write!(f, "Calculate Paycheck"),
       Operations::ReportWages => write!(f, "Report Wages"),
     }
   }
-}
-
-pub fn show() -> Operations {
-  let options = [Operations::ReportWages, Operations::CalculatePaycheck];
-  let mut menu = youchoose::Menu::new(options.iter()).preview(preview);
-
-  let choices = menu.show();
-  options[*choices.first().expect("Invalid choice given")]
 }
 
 fn preview(op: &Operations) -> String {
