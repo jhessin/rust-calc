@@ -21,7 +21,7 @@ pub fn run() -> anyhow::Result<()> {
         calculator.new_shift();
       }
       MenuData::Data(d) => {
-        calculator.update_shift(*choice_index, d.update());
+        calculator.update_shift(*choice_index, d);
       }
       MenuData::Quit => break,
     }

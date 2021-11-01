@@ -58,9 +58,9 @@ impl PaycheckCalculator {
     data
   }
 
-  pub fn update_shift(&mut self, index: usize, data: Shift) -> bool {
+  pub fn update_shift(&mut self, index: usize, shift: Shift) -> bool {
     if let Some(entry) = self.shifts.get_mut(index) {
-      *entry = data;
+      *entry = shift.update(self.static_year, self.static_month);
       true
     } else {
       false
