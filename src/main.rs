@@ -1,47 +1,48 @@
 #![allow(dead_code)]
-use std::io;
-
-use tui::{
-  backend::CrosstermBackend,
-  layout::{Constraint, Direction, Layout},
-  widgets::{Block, Borders},
-  Terminal,
-};
 
 use crate::lib::{
   calculate_paycheck, menu::operations::Operations, report_wages,
 };
+use cursive::views::Dialog;
+use cursive::Cursive;
 
 #[macro_use]
 mod lib;
 
 fn main() -> anyhow::Result<()> {
-  run_program()
+  cursive_test()
 }
 
-fn tui_test() -> anyhow::Result<()> {
-  let stdout = io::stdout();
-  let backend = CrosstermBackend::new(stdout);
-  let mut terminal = Terminal::new(backend)?;
-  terminal.draw(|f| {
-    let chunks = Layout::default()
-      .direction(Direction::Vertical)
-      .margin(1)
-      .constraints(
-        [
-          Constraint::Percentage(10),
-          Constraint::Percentage(80),
-          Constraint::Percentage(10),
-        ]
-        .as_ref(),
+fn cursive_test() -> anyhow::Result<()> {
+  let mut siv = Cursive::default();
+  siv.add_global_callback('q', |s| s.quit());
+  siv.add_layer(
+    Dialog::text(
+      "This is a survey!\n\
+  Press <Next> when you're ready.",
+    )
+    .title("Important survey")
+    .button("Next", |s| {
+      s.pop_layer();
+      s.add_layer(
+        Dialog::text("Did you do the thing?")
+          .title("Question 1")
+          .button("Yes!", |s| show_answer(s, "I knew it! Well done!"))
+          .button("No!", |s| show_answer(s, "I knew you couldn't be trusted!"))
+          .button("Uh?", |s| s.add_layer(Dialog::info("Try again!"))),
       )
-      .split(f.size());
-    let block = Block::default().title("Block").borders(Borders::ALL);
-    f.render_widget(block, chunks[0]);
-    let block = Block::default().title("Block 2").borders(Borders::ALL);
-    f.render_widget(block, chunks[1]);
-  })?;
+    }),
+  );
+
+  siv.run();
   Ok(())
+}
+
+fn show_answer(s: &mut Cursive, msg: &str) {
+  s.pop_layer();
+  s.add_layer(
+    Dialog::text(msg).title("Results").button("Finish", |s| s.quit()),
+  );
 }
 
 fn preview(op: &Operations) -> String {

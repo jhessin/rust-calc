@@ -11,11 +11,12 @@ impl Operations {
     [Operations::ReportWages, Operations::CalculatePaycheck];
 
   pub fn show() -> Operations {
-    let mut menu =
-      youchoose::Menu::new(Operations::EACH.iter()).preview(preview);
-
-    let choices = menu.show();
-    Operations::EACH[*choices.first().expect("Invalid choice given")]
+    // let mut menu =
+    //   youchoose::Menu::new(Operations::EACH.iter()).preview(preview);
+    //
+    // let choices = menu.show();
+    // Operations::EACH[*choices.first().expect("Invalid choice given")]
+    todo!("Show each operation in a menu")
   }
 }
 
