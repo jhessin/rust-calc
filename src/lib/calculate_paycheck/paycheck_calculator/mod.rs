@@ -33,8 +33,13 @@ impl PaycheckCalculator {
       .shifts
       .iter()
       .map(|shift| {
+        let display = format!(
+          "{} - {}",
+          shift.clock_in.date().format("%d %a"),
+          shift.clock_out.date().format("%d %a"),
+        );
         MenuResult::new(
-          &shift.clock_in.date().format("MM/DD").to_string(),
+          &display,
           &format!("{:?} - {:?}", shift.clock_in, shift.clock_out),
           MenuData::Data(*shift),
         )
