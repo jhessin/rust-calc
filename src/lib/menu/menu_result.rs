@@ -1,14 +1,12 @@
 use std::fmt;
 use std::fmt::Formatter;
 
-#[derive(Clone, Debug)]
 pub enum MenuData<T: Clone> {
-  Action(fn() -> T),
+  NewItem,
   Data(T),
   Quit,
 }
 
-#[derive(Clone, Debug)]
 pub struct MenuResult<T: Clone> {
   pub data: MenuData<T>,
   pub display: String,

@@ -1,67 +1,12 @@
 use std::fmt::Write;
 
-use chrono::{DateTime, Datelike, Local, TimeZone};
+use chrono::Datelike;
 
-use crate::lib::menu::menu_result::{MenuData, MenuResult};
+use crate::lib::calculate_paycheck::paycheck_calculator::shift::Shift;
 
-#[derive(Copy, Clone, Debug)]
-pub struct Shift {
-  /// The time clocked in.
-  clock_in: DateTime<Local>,
-  /// The time clocked out.
-  clock_out: DateTime<Local>,
-  /// The amount of incentive time if any.
-  incentive: Option<f64>,
-  /// The amount of time working short if any.
-  short: Option<f64>,
-}
+use super::super::menu::menu_result::{MenuData, MenuResult};
 
-impl Shift {
-  /// This will prompt the user for new shift data.
-  pub fn from_input() -> Self {
-    let year = prompt!("What year did you clock in?");
-    let month = prompt!("Month?");
-    let day = prompt!("Day?");
-    let hour: f64 = prompt!("What hour did you clock in (with decimal)");
-    let (hour, min, sec) =
-      (hour.floor() as u32, (hour.fract() * 60.0) as u32, 0);
-    let clock_in = Local.ymd(year, month, day).and_hms(hour, min, sec);
-    let year = prompt!("What year did you clock out?");
-    let month = prompt!("Month?");
-    let day = prompt!("Day?");
-    let hour: f64 = prompt!("What hour did you clock out (with decimal)");
-    let (hour, min, sec) =
-      (hour.floor() as u32, (hour.fract() * 60.0) as u32, 0);
-    let clock_out = Local.ymd(year, month, day).and_hms(hour, min, sec);
-    let incentive: bool = prompt!("Was incentive offered?");
-    let incentive =
-      if incentive { Some(prompt!("How many hours?")) } else { None };
-    let short: bool = prompt!("Were you short during the shift?");
-    let short = if short { Some(prompt!("How many hours?")) } else { None };
-    Shift { clock_in, clock_out, incentive, short }
-  }
-
-  /// returns the duration of the shift in hours
-  pub fn len(&self) -> f64 {
-    let dur = self.clock_out - self.clock_in;
-    (dur.num_hours() as f64) + (dur.num_minutes() as f64 / 60.0)
-  }
-
-  /// returns the amount of incentive earned
-  pub fn incentive_len(&self) -> Option<f64> {
-    self.incentive
-  }
-
-  /// returns the amount of short time earned
-  pub fn short_len(&self) -> Option<f64> {
-    self.short
-  }
-
-  /// Update shift data with user input
-  pub fn update(&self) -> Self {
-    todo!("Prompt user for updated info here")
-  }
-}
+pub mod shift;
 
 #[derive(Clone, Debug)]
 pub struct PaycheckCalculator {
@@ -75,11 +20,15 @@ pub struct PaycheckCalculator {
   short_diff: f64,
   /// A list of all the shifts that were worked this pay period.
   shifts: Vec<Shift>,
+  /// If there is a static year for this pay period (which is common) save it here.
+  static_year: Option<i32>,
+  /// If there is a static month for this pay period save it here.
+  static_month: Option<u32>,
 }
 
 impl PaycheckCalculator {
   /// Get menu data for calculator
-  pub fn menu(&self) -> Vec<MenuResult<Shift>> {
+  pub fn menu(&mut self) -> Vec<MenuResult<Shift>> {
     let mut data: Vec<MenuResult<Shift>> = self
       .shifts
       .iter()
@@ -94,7 +43,7 @@ impl PaycheckCalculator {
     data.push(MenuResult::new(
       "New shift",
       "Add a new shift",
-      MenuData::Action(Shift::from_input),
+      MenuData::NewItem,
     ));
     data.push(MenuResult::new(
       "Total",
@@ -122,18 +71,28 @@ impl PaycheckCalculator {
 impl PaycheckCalculator {
   /// This will prompt the user for new data to build a Calculator.
   pub fn from_input() -> Self {
+    let static_year: bool =
+      prompt!("(true/false) This pay period is within a single year.");
+    let static_year: Option<i32> =
+      if static_year { Some(prompt!("What year?")) } else { None };
+    let static_month: bool =
+      prompt!("(true/false) This pay period is within a single month.");
+    let static_month: Option<u32> =
+      if static_month { Some(prompt!("What number month?")) } else { None };
     PaycheckCalculator {
       base_rate: prompt!("What is the base rate?"),
       weekend_diff: prompt!("How much more is paid on weekends?"),
       incentive_diff: prompt!("How much incentive is offered?"),
       short_diff: prompt!("How much is given when the shift is short?"),
       shifts: vec![],
+      static_month,
+      static_year,
     }
   }
 
   /// add a shift to the paycheck
   pub fn new_shift(&mut self) {
-    self.shifts.push(Shift::from_input());
+    self.shifts.push(Shift::from_input(self.static_year, self.static_month));
   }
 
   pub fn rm_shift(&mut self, shift: usize) -> Shift {

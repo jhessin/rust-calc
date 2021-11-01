@@ -1,9 +1,8 @@
 use anyhow::Context;
 
-use crate::lib::{
-  calculate_paycheck::paycheck_calculator::Shift,
-  menu::menu_result::{MenuData, MenuResult},
-};
+use paycheck_calculator::shift::Shift;
+
+use super::menu::menu_result::{MenuData, MenuResult};
 
 mod paycheck_calculator;
 
@@ -18,9 +17,8 @@ pub fn run() -> anyhow::Result<()> {
     let choice_index = choice.first().context("Invalid selection")?;
     let choice = calc_menu.get(*choice_index).context("Invalid choice")?;
     match choice.data {
-      MenuData::Action(f) => {
-        let shift = f();
-        calculator += shift;
+      MenuData::NewItem => {
+        calculator.new_shift();
       }
       MenuData::Data(d) => {
         calculator.update_shift(*choice_index, d.update());
