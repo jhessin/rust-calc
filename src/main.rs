@@ -6,11 +6,17 @@ use cursive::default;
 mod lib;
 
 fn main() {
-  cursive_bare();
+  app();
 }
 
 fn cursive_bare() {
   let mut siv = default();
+
+  siv.run();
+}
+
+fn app() {
+  let mut siv = lib::app::App::new();
 
   siv.run();
 }
