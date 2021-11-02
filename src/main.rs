@@ -1,5 +1,3 @@
-#![allow(dead_code)]
-
 use cursive::default;
 
 #[macro_use]
@@ -9,6 +7,7 @@ fn main() {
   app();
 }
 
+#[allow(dead_code)]
 fn cursive_bare() {
   let mut siv = default();
 
