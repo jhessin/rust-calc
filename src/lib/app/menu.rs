@@ -1,8 +1,9 @@
 //! This is the Main Menu of the project. Here we can choose from different calculation apps.
 
+use cursive::{menu::MenuTree, views::Menubar};
+
 // This can be used to import everything in the app.
 use crate::all::*;
-use cursive::{menu::MenuTree, views::Menubar};
 
 pub fn menu() -> Menubar {
   // The main menu
@@ -18,7 +19,7 @@ pub fn menu() -> Menubar {
   let mut activity_menu = MenuTree::new();
   activity_menu.add_leaf("Wage Calculator", |s| {
     s.data().app_type = Some(AppType::WageCalculator);
-    s.data().app_type.unwrap().run();
+    s.data().app_type.unwrap().run(s);
   });
 
   // Add menus to menu bar

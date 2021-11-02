@@ -1,6 +1,8 @@
 //! This holds all the global data for the app.
 //! Can be accessed with the s.data() trait that is added to the Cursive object.
 
+use std::fs::File;
+
 use anyhow::*;
 use cursive::{
   traits::*,
@@ -8,7 +10,6 @@ use cursive::{
   Cursive, Printer,
 };
 use serde::{Deserialize, Serialize};
-use std::fs::File;
 
 const DATA: &str = "data";
 const FILENAME: &str = "data.yml";
@@ -25,9 +26,9 @@ impl Default for AppType {
 }
 
 impl AppType {
-  pub fn run(&self) {
+  pub fn run(&self, siv: &mut Cursive) {
     match self {
-      AppType::WageCalculator => super::wage_calculator::run(),
+      AppType::WageCalculator => super::wage_calculator::run(siv),
     }
   }
 }
