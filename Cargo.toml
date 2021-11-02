@@ -10,6 +10,6 @@ chrono = { version = "0.4.19", features = ["serde"] }
 anyhow = "1.0.44"
 
 [dependencies.cursive]
-version = "*"
+version = "0.16"
 default-features = false
 features = ["crossterm-backend"]
