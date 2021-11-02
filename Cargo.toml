@@ -7,6 +7,8 @@ edition = "2018"
 
 [dependencies]
 chrono = { version = "0.4.19", features = ["serde"] }
+serde = { version = "1.0", features = ["derive"] }
+serde_yaml = "0.8.21"
 anyhow = "1.0.44"
 
 [dependencies.cursive]
