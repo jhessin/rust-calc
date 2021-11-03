@@ -1,9 +1,7 @@
 //! This is the Main Menu of the project. Here we can choose from different calculation apps.
 
-use cursive::{menu::MenuTree, views::Menubar};
-
 // This can be used to import everything in the app.
-use crate::all::*;
+use crate::prelude::*;
 
 pub fn menu() -> Menubar {
   // The main menu

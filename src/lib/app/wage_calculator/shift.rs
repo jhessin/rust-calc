@@ -1,11 +1,11 @@
-use chrono::{DateTime, Local, TimeZone};
+use crate::prelude::*;
 
-#[derive(Copy, Clone, Debug)]
+#[derive(Copy, Clone, Debug, Serialize, Deserialize)]
 pub struct Shift {
   /// The time clocked in.
-  pub clock_in: DateTime<Local>,
+  pub clock_in: NaiveTime,
   /// The time clocked out.
-  pub clock_out: DateTime<Local>,
+  pub clock_out: NaiveTime,
   /// The amount of incentive time if any.
   pub incentive: Option<f64>,
   /// The amount of time working short if any.
