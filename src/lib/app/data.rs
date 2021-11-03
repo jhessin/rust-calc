@@ -12,6 +12,7 @@ const FILENAME: &str = "data.yml";
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct AppData {
   pub app_type: Option<AppType>,
+  pub calculator: PaycheckCalculator,
   pub shifts: Vec<Shift>,
   pub date_box: Option<NaiveDate>,
   pub time_box: Option<NaiveTime>,
