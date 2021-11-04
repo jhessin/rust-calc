@@ -11,7 +11,6 @@ const FILENAME: &str = "data.yml";
 
 #[derive(Default, Debug, Serialize, Deserialize)]
 pub struct AppData {
-  pub app_type: Option<AppType>,
   pub calculator: PaycheckCalculator,
   pub shifts: Vec<Shift>,
   pub date_box: Option<NaiveDate>,
@@ -32,7 +31,9 @@ impl Default for AppType {
 impl AppType {
   pub fn run(&self, siv: &mut Cursive) {
     match self {
-      AppType::WageCalculator => super::wage_calculator::run(siv),
+      AppType::WageCalculator => {
+        super::wage_calculator::run_wage_calculator(siv)
+      }
     }
   }
 }

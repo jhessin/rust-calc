@@ -16,8 +16,7 @@ pub fn menu() -> Menubar {
   // Activity menu
   let mut activity_menu = MenuTree::new();
   activity_menu.add_leaf("Wage Calculator", |s| {
-    s.data().app_type = Some(AppType::WageCalculator);
-    s.data().app_type.unwrap().run(s);
+    AppType::WageCalculator.run(s);
   });
 
   // Add menus to menu bar

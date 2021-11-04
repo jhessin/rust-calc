@@ -8,7 +8,7 @@ pub use paycheck_calculator::*;
 pub use shift::*;
 
 // This creates the ui and adds it to the screen.
-pub fn run(siv: &mut Cursive) {
+pub fn run_wage_calculator(siv: &mut Cursive) {
   let calc_view = new_calculator_view(siv);
   siv.add_layer(calc_view);
   // This gets a date and stores it

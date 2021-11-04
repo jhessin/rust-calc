@@ -28,10 +28,11 @@ fn app() {
 
   // add the basic data layer.
   siv.add_layer(AppData::new());
+  siv.add_fullscreen_layer(menu());
 
   // TODO: add other layers here.
-
-  siv.add_fullscreen_layer(menu());
+  let calc = paycheck_calculator::new_calculator_view(&mut siv);
+  siv.add_layer(calc);
 
   // finally, run the app.
   siv.run();
